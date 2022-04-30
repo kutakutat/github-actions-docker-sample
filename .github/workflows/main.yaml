@@ -25,6 +25,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/githubActionsSample:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/githubactionsdokcersample:latest
       - name : Show Payload
         run: cat $GITHUB_EVENT_PATH
