@@ -30,8 +30,20 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
+          # TODO 環境も加味した Tag 付のベストプラクティスを検討する
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/githubactionsdokcersample:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache,mode=max
+  runOnMainBranch:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 5
+    steps:
+      - name: This Job runs only on main branch
+        run: echo "This job runs only on $GITHUB_REF"
   deploy:
     runs-on: ubuntu-latest
     needs: build
