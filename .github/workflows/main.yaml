@@ -74,6 +74,6 @@ jobs:
         run: echo "deploy"
       - name: show outputs across jobs
         run: |
-          echo "Build Job Status : ${{jobs.build.outputs.status}}"
+          echo "Build Job Status : ${{needs.build.outputs.status}}"
           echo "Deploy Job Status : ${{needs.deploy.outputs.status}}"
           
