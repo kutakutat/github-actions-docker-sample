@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     # default time out が 6 時間なので設定
     timeout-minutes: 5
+    # ステップの出力をジョブの出力にマップ
+    outputs:
+      status: ${{ steps.result.outputs.status }}
     steps:
       - name: Show Payload
         run: cat $GITHUB_EVENT_PATH
@@ -36,6 +39,9 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/githubactionsdokcersample:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache,mode=max
+      - name: Record Job Status
+        id: result
+        run: echo "::set-output name=status::${{ job.status }}"
   runOnMainBranch:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -48,11 +54,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     timeout-minutes: 5
+    outputs:
+      status: ${{ steps.result.outputs.status }}
     steps:
       - name: Get Image From Registory
         run: echo "got the Image From Registory"
       - name: Deploy
         run: echo "deploy"
+      - name: Record Job Status
+        id: result
+        run: echo "::set-output name=status::${{ job.status }}"
   notify:
     if: always()
     runs-on: ubuntu-latest
@@ -61,4 +72,8 @@ jobs:
     steps:
       - name: notify
         run: echo "deploy"
+      - name: show outputs across jobs
+        run: |
+          echo "Build Job Status : ${{jobs.build.outputs.status}}"
+          echo "Deploy Job Status : ${{needs.deploy.outputs.status}}"
           
